@@ -249,7 +249,7 @@ id := generator.NewID()
 // Example: "domifaso-a1b2c"
 ```
 
-#### `BatchGenerateRandomIDs(count int) []string`
+#### `BatchGenerateRandomIDs(count int64) []string`
 
 Generates unique random IDs without duplicates.
 
@@ -259,7 +259,7 @@ ids := generator.BatchGenerateRandomIDs(10)
 // Returns empty slice if count > MaxCombinations()
 ```
 
-#### `BatchGenerateIDs(count, startPosition int) []string`
+#### `BatchGenerateIDs(count, startPosition int64) []string`
 
 Generates sequential IDs starting from a specific position.
 
@@ -268,7 +268,7 @@ ids := generator.BatchGenerateIDs(5, 100)
 // Returns 5 sequential IDs starting from position 100
 ```
 
-#### `IDToPosition(id string) int`
+#### `IDToPosition(id string) int64`
 
 Converts an ID back to its position in the sequence.
 
@@ -278,7 +278,7 @@ position := generator.IDToPosition("dodododo-00000")
 // Returns: -1 for invalid IDs
 ```
 
-#### `PositionToID(position int) string`
+#### `PositionToID(position int64) string`
 
 Converts a position to its corresponding ID.
 
@@ -288,7 +288,7 @@ id := generator.PositionToID(0)
 // Returns: "" for negative positions
 ```
 
-#### `MaxCombinations() int`
+#### `MaxCombinations() int64`
 
 Returns the maximum number of unique IDs possible with current configuration.
 
@@ -307,7 +307,7 @@ Perfect for database primary keys, ordered records, or pagination:
 // Generate user IDs starting from position 1000
 userIDs := generator.BatchGenerateIDs(100, 1000)
 for i, id := range userIDs {
-    fmt.Printf("User %d: %s\n", 1000+i, id)
+    fmt.Printf("User %d: %s\n", 1000+int64(i), id)
 }
 ```
 

@@ -27,7 +27,7 @@ func main() {
 	fmt.Printf("Larger unique batch (%d IDs): %v\n", len(largerBatch), largerBatch)
 
 	// Batch generate sequential IDs
-	batchIDs := generator.BatchGenerateIDs(3, 0)
+	batchIDs := generator.BatchGenerateIDs(int64(3), int64(0))
 	fmt.Printf("Sequential batch IDs: %v\n", batchIDs)
 
 	// ID and position conversion
@@ -39,7 +39,7 @@ func main() {
 
 	// Check maximum combinations
 	maxCombs := generator.MaxCombinations()
-	fmt.Printf("Max combinations: %s\n", formatNumber(maxCombs))
+	fmt.Printf("Max combinations: %s\n", formatNumber(int(maxCombs)))
 
 	// Use default configuration
 	defaultGen := doremid.NewWithDefaults()
@@ -57,7 +57,7 @@ func main() {
 	fmt.Printf("Small config max combinations: %d\n", smallGen.MaxCombinations())
 
 	// Batch generation with limits example
-	limitedIDs := smallGen.BatchGenerateIDs(10, 80) // Automatically limited
+	limitedIDs := smallGen.BatchGenerateIDs(int64(10), int64(80)) // Automatically limited
 	fmt.Printf("Limited batch generation: %d IDs\n", len(limitedIDs))
 }
 

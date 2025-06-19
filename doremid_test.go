@@ -87,8 +87,8 @@ func TestBatchGenerateIDs(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		count         int
-		startPosition int
+		count         int64
+		startPosition int64
 	}{
 		{
 			name:          "generate 5 IDs",
@@ -112,7 +112,7 @@ func TestBatchGenerateIDs(t *testing.T) {
 			ids := generator.BatchGenerateIDs(tt.count, tt.startPosition)
 
 			// Check count
-			if len(ids) != tt.count {
+			if int64(len(ids)) != tt.count {
 				t.Errorf("generated ID count is incorrect, expected %d, got %d", tt.count, len(ids))
 			}
 
@@ -146,7 +146,7 @@ func TestIDToPosition(t *testing.T) {
 	tests := []struct {
 		name     string
 		id       string
-		expected int
+		expected int64
 	}{
 		{
 			name:     "first ID",
@@ -199,7 +199,7 @@ func TestPositionToID(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		position int
+		position int64
 		expected string
 	}{
 		{
@@ -237,7 +237,7 @@ func TestPositionToIDAndIDToPosition(t *testing.T) {
 	})
 
 	// Test round-trip conversion consistency
-	positions := []int{0, 1, 10, 100, 500, 1000}
+	positions := []int64{0, 1, 10, 100, 500, 1000}
 
 	for _, pos := range positions {
 		t.Run(fmt.Sprintf("round-trip test position %d", pos), func(t *testing.T) {
@@ -267,7 +267,7 @@ func TestIntPow(t *testing.T) {
 
 	// Test some known positions and expected IDs
 	testCases := []struct {
-		position int
+		position int64
 		expected string
 	}{
 		{0, "do-00"},
@@ -293,7 +293,7 @@ func TestLargeNumbers(t *testing.T) {
 	})
 
 	// Test handling of large numbers
-	largePositions := []int{10000, 50000, 100000}
+	largePositions := []int64{10000, 50000, 100000}
 
 	for _, pos := range largePositions {
 		t.Run(fmt.Sprintf("large number test %d", pos), func(t *testing.T) {
@@ -364,7 +364,7 @@ func TestMaxCombinations(t *testing.T) {
 		name                   string
 		justIntonationDigits   int
 		equalTemperamentDigits int
-		expectedMax            int
+		expectedMax            int64
 	}{
 		{
 			name:                   "1x1 configuration",
@@ -414,9 +414,9 @@ func TestBatchGenerateIDsWithLimits(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		count         int
-		startPosition int
-		expectedCount int
+		count         int64
+		startPosition int64
+		expectedCount int64
 		shouldBeEmpty bool
 	}{
 		{
@@ -488,13 +488,13 @@ func TestBatchGenerateIDsWithLimits(t *testing.T) {
 				return
 			}
 
-			if len(ids) != tt.expectedCount {
+			if int64(len(ids)) != tt.expectedCount {
 				t.Errorf("expected %d IDs, got %d", tt.expectedCount, len(ids))
 			}
 
 			// Verify all IDs are valid and sequential
 			for i, id := range ids {
-				expectedPos := tt.startPosition + i
+				expectedPos := tt.startPosition + int64(i)
 				actualPos := generator.IDToPosition(id)
 				if actualPos != expectedPos {
 					t.Errorf("ID[%d] position mismatch: expected %d, got %d", i, expectedPos, actualPos)
@@ -515,8 +515,8 @@ func TestBatchGenerateRandomIDs(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		count         int
-		expectedCount int
+		count         int64
+		expectedCount int64
 		shouldBeEmpty bool
 	}{
 		{
@@ -568,7 +568,7 @@ func TestBatchGenerateRandomIDs(t *testing.T) {
 			ids := generator.BatchGenerateRandomIDs(tt.count)
 
 			// Check count
-			if len(ids) != tt.expectedCount {
+			if int64(len(ids)) != tt.expectedCount {
 				t.Errorf("expected %d IDs, got %d", tt.expectedCount, len(ids))
 			}
 
@@ -613,7 +613,7 @@ func TestBatchGenerateRandomIDs(t *testing.T) {
 
 			// Check uniqueness - this should be 100% for the new implementation
 			uniqueIDs := make(map[string]bool)
-			uniquePositions := make(map[int]bool)
+			uniquePositions := make(map[int64]bool)
 
 			for i, id := range ids {
 				if uniqueIDs[id] {
@@ -629,11 +629,11 @@ func TestBatchGenerateRandomIDs(t *testing.T) {
 			}
 
 			// Verify we have exactly the expected number of unique IDs
-			if len(uniqueIDs) != tt.expectedCount {
+			if int64(len(uniqueIDs)) != tt.expectedCount {
 				t.Errorf("Expected %d unique IDs, got %d", tt.expectedCount, len(uniqueIDs))
 			}
 
-			if len(uniquePositions) != tt.expectedCount {
+			if int64(len(uniquePositions)) != tt.expectedCount {
 				t.Errorf("Expected %d unique positions, got %d", tt.expectedCount, len(uniquePositions))
 			}
 		})

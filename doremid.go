@@ -119,7 +119,7 @@ func (g *Generator) NewID() string {
 // Returns a slice of unique random IDs. Returns empty slice if count <= 0
 // or count exceeds maximum possible combinations.
 // Uses random sampling from all possible positions to ensure uniqueness without collision checking.
-func (g *Generator) BatchGenerateRandomIDs(count int) []string {
+func (g *Generator) BatchGenerateRandomIDs(count int64) []string {
 	if count <= 0 {
 		return []string{}
 	}
@@ -132,12 +132,12 @@ func (g *Generator) BatchGenerateRandomIDs(count int) []string {
 	}
 
 	// Generate random sample of positions without replacement
-	positions := g.randomSample(maxCombinations, count)
+	positions := g.randomSample(int(maxCombinations), int(count))
 
 	// Convert positions to IDs
 	ids := make([]string, count)
 	for i, pos := range positions {
-		ids[i] = g.PositionToID(pos)
+		ids[i] = g.PositionToID(int64(pos))
 	}
 
 	return ids
@@ -179,9 +179,9 @@ func (g *Generator) randomSample(max, count int) []int {
 
 // MaxCombinations returns the maximum number of unique IDs that can be generated
 // with the current configuration.
-func (g *Generator) MaxCombinations() int {
-	justMax := g.intPow(g.justIntonationLen, g.JustIntonationDigits)
-	equalMax := g.intPow(g.equalTemperamentLen, g.EqualTemperamentDigits)
+func (g *Generator) MaxCombinations() int64 {
+	justMax := int64(g.intPow(g.justIntonationLen, g.JustIntonationDigits))
+	equalMax := int64(g.intPow(g.equalTemperamentLen, g.EqualTemperamentDigits))
 	return justMax * equalMax
 }
 
@@ -193,7 +193,7 @@ func (g *Generator) MaxCombinations() int {
 //
 // Returns a slice of sequential IDs. The actual count may be less than requested
 // if it would exceed the maximum possible combinations or go beyond valid positions.
-func (g *Generator) BatchGenerateIDs(count int, startPosition int) []string {
+func (g *Generator) BatchGenerateIDs(count int64, startPosition int64) []string {
 	if count <= 0 || startPosition < 0 {
 		return []string{}
 	}
@@ -216,7 +216,7 @@ func (g *Generator) BatchGenerateIDs(count int, startPosition int) []string {
 	}
 
 	ids := make([]string, count)
-	for i := 0; i < count; i++ {
+	for i := int64(0); i < count; i++ {
 		ids[i] = g.PositionToID(startPosition + i)
 	}
 	return ids
@@ -230,7 +230,7 @@ func (g *Generator) BatchGenerateIDs(count int, startPosition int) []string {
 // Returns:
 //   - position in the sequence (0-based)
 //   - -1 if the ID format is invalid
-func (g *Generator) IDToPosition(id string) int {
+func (g *Generator) IDToPosition(id string) int64 {
 	// Split ID by separator
 	parts := strings.Split(id, g.Separator)
 	if len(parts) != 2 {
@@ -246,31 +246,31 @@ func (g *Generator) IDToPosition(id string) int {
 	}
 
 	// Parse musical note part using O(1) map lookup
-	justValue := 0
+	justValue := int64(0)
 	for i := 0; i < len(justPart); i += 2 {
 		if i+1 >= len(justPart) {
 			return -1 // Length is not a multiple of 2
 		}
 		twoChar := justPart[i : i+2]
 		if index, found := g.justIntonationMap[twoChar]; found {
-			justValue = justValue*g.justIntonationLen + index
+			justValue = justValue*int64(g.justIntonationLen) + int64(index)
 		} else {
 			return -1
 		}
 	}
 
 	// Parse alphanumeric part using O(1) map lookup
-	equalValue := 0
+	equalValue := int64(0)
 	for _, char := range []byte(equalPart) {
 		if index, found := g.equalTemperamentMap[char]; found {
-			equalValue = equalValue*g.equalTemperamentLen + index
+			equalValue = equalValue*int64(g.equalTemperamentLen) + int64(index)
 		} else {
 			return -1
 		}
 	}
 
 	// Calculate total position
-	return justValue*g.intPow(g.equalTemperamentLen, g.EqualTemperamentDigits) + equalValue
+	return justValue*int64(g.intPow(g.equalTemperamentLen, g.EqualTemperamentDigits)) + equalValue
 }
 
 // PositionToID generates an ID based on its position in the sequential order.
@@ -281,13 +281,13 @@ func (g *Generator) IDToPosition(id string) int {
 // Returns:
 //   - the corresponding ID string
 //   - empty string if position is negative
-func (g *Generator) PositionToID(position int) string {
+func (g *Generator) PositionToID(position int64) string {
 	if position < 0 {
 		return ""
 	}
 
 	// Calculate maximum value for alphanumeric part
-	equalMax := g.intPow(g.equalTemperamentLen, g.EqualTemperamentDigits)
+	equalMax := int64(g.intPow(g.equalTemperamentLen, g.EqualTemperamentDigits))
 
 	// Separate values for musical note and alphanumeric parts
 	justValue := position / equalMax
@@ -301,8 +301,8 @@ func (g *Generator) PositionToID(position int) string {
 	justDigits := make([]int, g.JustIntonationDigits)
 	temp := justValue
 	for i := g.JustIntonationDigits - 1; i >= 0; i-- {
-		justDigits[i] = temp % g.justIntonationLen
-		temp /= g.justIntonationLen
+		justDigits[i] = int(temp % int64(g.justIntonationLen))
+		temp /= int64(g.justIntonationLen)
 	}
 
 	for _, digit := range justDigits {
@@ -316,8 +316,8 @@ func (g *Generator) PositionToID(position int) string {
 	equalDigits := make([]int, g.EqualTemperamentDigits)
 	temp = equalValue
 	for i := g.EqualTemperamentDigits - 1; i >= 0; i-- {
-		equalDigits[i] = temp % g.equalTemperamentLen
-		temp /= g.equalTemperamentLen
+		equalDigits[i] = int(temp % int64(g.equalTemperamentLen))
+		temp /= int64(g.equalTemperamentLen)
 	}
 
 	for _, digit := range equalDigits {
